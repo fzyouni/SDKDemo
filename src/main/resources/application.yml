@@ -1,0 +1,19 @@
+server:
+  port: 8088
+
+file:
+  prefix: file.log
+
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://hybrid01.debugboxcreate4762.sensorsdata.cloud:3305/metadata
+#    username: work
+#    password: PFz2HdG/KZ
+#    type: com.zaxxer.hikari.HikariDataSource
+
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    database: mysql

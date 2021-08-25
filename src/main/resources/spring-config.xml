@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <!-- 本地日志模式（此模式会在指定路径生成相应的日志文件） -->
+    <bean id="loggingConsumer" class="com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer">
+        <constructor-arg name="filenamePrefix" value="您的日志文件路径"/>
+    </bean>
+
+    <!-- debug 模式(此模式只适用于测试集成 SDK 功能，千万不要使用到生产环境！！！) -->
+    <!--<bean id="debugConsumer" class="com.sensorsdata.analytics.javasdk.consumer.DebugConsumer">
+        <constructor-arg name="serverUrl" value="数据接收地址"/>
+        <constructor-arg name="writeData" value="true"/>
+    </bean>-->
+
+    <!-- 网络批量发送模式（此模式在容器关闭的时候，如果存在数据还没有发送完毕，就会丢失未发送的数据！！！）-->
+    <!--<bean id="batchConsumer" class="com.sensorsdata.analytics.javasdk.consumer.BatchConsumer">
+        <constructor-arg name="serverUrl" value="数据接收地址"/>
+    </bean>-->
+
+    <!-- 此处选择合适的模式进行数据采集操作（此处选择本地日志模式） -->
+    <bean id="sensorsAnalytics" class="com.sensorsdata.analytics.javasdk.SensorsAnalytics" destroy-method="shutdown">
+        <constructor-arg name="consumer" ref="loggingConsumer"/>
+    </bean>
+
+    <!-- 通过构建的静态工厂创建 Bean -->
+    <bean id="abTest" class="com.sensorsdata.demo.config.ABTestInstanceFactory"
+          factory-method="getABTestConfigInstance">
+        <constructor-arg name="url" value="分流试验请求地址"/>
+        <constructor-arg name="sa" ref="sensorsAnalytics"/>
+    </bean>
+</beans>
