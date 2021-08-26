@@ -1,7 +1,6 @@
 package com.sensorsdata.demo.controller;
 
 import com.sensorsdata.analytics.javasdk.exceptions.InvalidArgumentException;
-
 import com.sensorsdata.demo.service.ITestService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -10,7 +10,9 @@ import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 使用同步采集日志
@@ -39,12 +41,15 @@ public class HelloSensors {
     // 1.1 访问首页
     // 前面有$开头的property字段，是SA提供给用户的预置字段
     // 对于预置字段，已经确定好了字段类型和字段的显示名
+    Map<String,Object> params = new HashMap<>();
+    params.put("birthday","2021-08-26");
     EventRecord firstRecord = EventRecord.builder().setDistinctId(cookieId).isLoginId(Boolean.FALSE)
         .setEventName("track")
         .addProperty("$time", Calendar.getInstance().getTime())
         .addProperty("Channel", "baidu")
         .addProperty("$project", "abc")
         .addProperty("$token", "123")
+        .addProperties(params)
         .build();
     sa.track(firstRecord);
     // 1.2 搜索商品

@@ -8,7 +8,8 @@ import com.sensorsdata.analytics.javasdk.bean.UserRecord;
 import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
 import com.sensorsdata.analytics.javasdk.exceptions.InvalidArgumentException;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,11 +23,11 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0.0
  * @since 2021/07/31 10:28
  */
-@Slf4j
 public class SensorsLogsUtil {
 
   private SensorsLogsUtil() {
   }
+  private  final static Logger logger = LoggerFactory.getLogger(SensorsLogsUtil.class);
 
   /**
    * 根据业务服务器实际性能决定开启线程数
@@ -43,7 +44,7 @@ public class SensorsLogsUtil {
       //在这里配置神策 SDK 初始化操作
       sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
     } catch (Exception e) {
-      log.error("initialize sensorsAnalytics fail.{}", e.getMessage());
+      logger.error("initialize sensorsAnalytics fail.{}", e.getMessage());
     }
   }
 
@@ -63,7 +64,7 @@ public class SensorsLogsUtil {
    * 非程序结束，不要调用此方法
    */
   public static void shutdown() {
-    log.info("start to shutdown the thread pool.");
+    logger.info("start to shutdown the thread pool.");
     executorService.shutdown();
     try {
       //等待未完成的任务结束
@@ -71,13 +72,13 @@ public class SensorsLogsUtil {
         //取消当前执行的任务
         executorService.shutdownNow();
         if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-          log.error("Thread pool can't be shutdown even with interrupting worker threads.");
+          logger.error("Thread pool can't be shutdown even with interrupting worker threads.");
         }
       }
     } catch (InterruptedException e) {
       // 重新取消当前线程进行中断
       executorService.shutdownNow();
-      log.error("The current server thread is interrupted when it is trying to stop the worker threads. ");
+      logger.error("The current server thread is interrupted when it is trying to stop the worker threads. ");
       // 保留中断状态
       Thread.currentThread().interrupt();
     }

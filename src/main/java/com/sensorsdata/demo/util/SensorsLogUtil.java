@@ -6,7 +6,8 @@ import com.sensorsdata.analytics.javasdk.bean.ItemRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
 import com.sensorsdata.analytics.javasdk.exceptions.InvalidArgumentException;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,11 +19,12 @@ import java.util.concurrent.Executors;
  * @version 1.0.0
  * @since 2021/07/30 17:17
  */
-@Slf4j
 public class SensorsLogUtil {
 
   private SensorsLogUtil() {
   }
+
+  private  final static Logger logger = LoggerFactory.getLogger(SensorsLogUtil.class);
   /**
    * 根据业务服务器实际性能决定开启线程数
    */
@@ -59,7 +61,7 @@ public class SensorsLogUtil {
   }
 
   public static void shutdown() {
-    log.info("start to shutdown the thread pool.");
+    logger.info("start to shutdown the thread pool.");
     executorService.shutdown();
   }
 
@@ -105,7 +107,7 @@ public class SensorsLogUtil {
             break;
         }
       } catch (InvalidArgumentException e) {
-        log.error("log write to sensors fail.{}", e.getMessage());
+        logger.error("log write to sensors fail.{}", e.getMessage());
       }
     }
   }
