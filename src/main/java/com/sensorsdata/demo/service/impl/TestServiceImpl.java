@@ -12,19 +12,23 @@ import com.sensorsdata.demo.service.ITestService;
 import com.sensorsdata.demo.util.SensorsLogUtil;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author fz <fangzhuo@sensorsdata.cn>
@@ -45,16 +49,17 @@ public class TestServiceImpl implements ITestService {
   @Autowired
   ISensorsAnalytics sa;
 
+  private ObjectMapper mapper = SensorsAnalyticsUtil.getJsonObjectMapper();
+
   @Override
   public String visitHome(String cookieId) throws InvalidArgumentException, JsonProcessingException {
     EventRecord firstRecord = EventRecord.builder().setDistinctId(cookieId).isLoginId(Boolean.FALSE)
         .setEventName("track")
         .addProperty("$time", Calendar.getInstance().getTime())
         .addProperty("Channel", "baidu")
-        .addProperty("$project", "abc")
-        .addProperty("$token", "123")
         .build();
     sa.track(firstRecord);
+    sa.flush();
     return String.format("用户访问网站记录已生成：%s", SensorsAnalyticsUtil.getJsonObjectMapper().writeValueAsString(firstRecord));
   }
 
@@ -71,6 +76,7 @@ public class TestServiceImpl implements ITestService {
   @Override
   public String signup(String cookieId, String userId) throws InvalidArgumentException {
     sa.trackSignUp(userId, cookieId);
+    sa.flush();
     return String.format("用户登陆信息已生成：用户登陆id:%s,匿名id:%s", userId, cookieId);
   }
 
@@ -106,23 +112,59 @@ public class TestServiceImpl implements ITestService {
 
   @Override
   public String hello(String userId) throws InvalidArgumentException {
-    final EventRecord.Builder test = EventRecord.builder().setDistinctId("fz-1").setEventName("test").isLoginId(true);
+    /*final EventRecord.Builder test = EventRecord.builder().setDistinctId("fz-1").setEventName("test").isLoginId(true);
     if (Objects.nonNull(userId)) {
       test.addProperty("haha", userId);
     }
-    EventRecord build = test.build();
-    return "success";
+    EventRecord build = test.build();*/
+    Long start = System.currentTimeMillis();
+    doCouponTakeReport();
+    return String.format("执行消耗时间为：%d", System.currentTimeMillis() - start);
   }
 
   @Override
   public void asycLog() throws InvalidArgumentException {
-    for (int i = 0; i < 20; i++) {
-      EventRecord record =
-          EventRecord.builder().setDistinctId("fz-" + i).setEventName("test").isLoginId(true).addProperty("test",
-              "hello").build();
+    doCouponTakeReport();
+  }
+
+  @Async
+  public void doCouponTakeReport() {
+    List<TransLog> transLog = searchLogList();
+    transLog.parallelStream().forEach(this::createReportByParam);
+  }
+
+  private List<TransLog> searchLogList() {
+    List<TransLog> res = new ArrayList<>(10000);
+    for (int i = 0; i < 10000; i++) {
+      res.add(new TransLog("test-" + i, true));
+    }
+    return res;
+  }
+
+  private void createReportByParam(TransLog transLog) {
+    Map<String, Object> postMap = new HashMap<String, Object>(16);
+    postMap.put("generateTime", System.currentTimeMillis());
+    try {
+      sa.track(transLog.distinctId, transLog.getIsLoginId(), "coupon_collection", postMap);
+    } catch (InvalidArgumentException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Data
+  @AllArgsConstructor
+  static class TransLog {
+    private String distinctId;
+    private Boolean isLoginId;
+  }
 
 
-      SensorsLogUtil.event(sa, record);
+  @Async
+  public void generateEventLog(String userId, String eventName) {
+    try {
+      sa.track(userId, true, eventName);
+    } catch (InvalidArgumentException e) {
+      log.error(e.getMessage());
     }
   }
 
@@ -136,18 +178,27 @@ public class TestServiceImpl implements ITestService {
     return System.currentTimeMillis() - start;
   }
 
-  private Map<String, Object> generateCommonAttr(HttpRequest httpRequest) {
-    Map<String, Object> superProp = new HashMap<>(16);
-    superProp.put("useragent", httpRequest.getHeaders("useragent"));
-    //do thing
-    return superProp;
-  }
+
 
   @Override
   public String abTest(String userId, String experimentVariableName, String defaultValue)
       throws IOException {
     Experiment<String> experiment = abTest.asyncFetchABTest(userId, true, experimentVariableName, defaultValue);
-    return String.format("获取试验结果为：%s", SensorsAnalyticsUtil.getJsonObjectMapper().writeValueAsString(experiment));
+    return String.format("获取试验结果为：%s", mapper.writeValueAsString(experiment));
+  }
+
+  @Override
+  public String fastFetchABTest(String userId, String experimentVariableName, String defaultValue)
+      throws JsonProcessingException {
+    Experiment<String> experiment = abTest.fastFetchABTest(userId, true, experimentVariableName, defaultValue);
+    return String.format("获取试验结果为：%s", mapper.writeValueAsString(experiment));
+  }
+
+  @Override
+  public String asyncFetchABTest(String userId, String experimentVariableName, String defaultValue)
+      throws JsonProcessingException {
+    Experiment<String> experiment = abTest.asyncFetchABTest(userId, true, experimentVariableName, defaultValue);
+    return String.format("获取试验结果为：%s", mapper.writeValueAsString(experiment));
   }
 
   @Override
@@ -166,6 +217,8 @@ public class TestServiceImpl implements ITestService {
     return "";
   }
 
-
-
+  @Override
+  public void flush() {
+    sa.flush();
+  }
 }

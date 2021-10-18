@@ -1,9 +1,12 @@
 server:
-  port: 8088
+  port: 8090
 
 file:
   prefix: file.log
 
+logging:
+  config:
+    classpath: log4j2.xml
 #spring:
 #  datasource:
 #    driver-class-name: com.mysql.jdbc.Driver

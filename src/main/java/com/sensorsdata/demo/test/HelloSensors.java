@@ -6,7 +6,9 @@ import com.sensorsdata.analytics.javasdk.bean.EventRecord;
 import com.sensorsdata.analytics.javasdk.bean.ItemRecord;
 import com.sensorsdata.analytics.javasdk.bean.SuperPropertiesRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
+import com.sensorsdata.analytics.javasdk.consumer.BatchConsumer;
 import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
+import com.sensorsdata.analytics.javasdk.consumer.DebugConsumer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,8 +27,9 @@ public class HelloSensors {
 
   public static void main(final String[] args) throws Exception {
     // LoggingConsumer
-    final ISensorsAnalytics sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
-
+    final ISensorsAnalytics sa =
+        new SensorsAnalytics(new BatchConsumer("http://10.129.138.189:8106/sa?project=production"));
+    // final ISensorsAnalytics sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
     //设置公共属性,以后上传的每一个事件都附带该属性
     SuperPropertiesRecord propertiesRecord = SuperPropertiesRecord.builder()
         .addProperty("$os", "Windows")
@@ -41,13 +44,12 @@ public class HelloSensors {
     // 1.1 访问首页
     // 前面有$开头的property字段，是SA提供给用户的预置字段
     // 对于预置字段，已经确定好了字段类型和字段的显示名
-    Map<String,Object> params = new HashMap<>();
-    params.put("birthday","2021-08-26");
+    Map<String, Object> params = new HashMap<>();
+    params.put("birthday", "2021-08-26");
     EventRecord firstRecord = EventRecord.builder().setDistinctId(cookieId).isLoginId(Boolean.FALSE)
         .setEventName("track")
         .addProperty("$time", Calendar.getInstance().getTime())
         .addProperty("Channel", "baidu")
-        .addProperty("$project", "abc")
         .addProperty("$token", "123")
         .addProperties(params)
         .build();

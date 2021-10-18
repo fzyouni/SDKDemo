@@ -6,6 +6,7 @@ import com.sensorsdata.demo.service.ITestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -108,6 +109,103 @@ public class TestController {
       throws InvalidArgumentException, IOException {
     return testService.abTest(userId, experimentVariableName, defaultValue);
   }
+
+  @GetMapping("asyncFetchABTest")
+  public String asyncFetchABTest(String userId, String experimentVariableName, String defaultValue)
+      throws JsonProcessingException {
+    return testService.asyncFetchABTest(userId, experimentVariableName, defaultValue);
+  }
+
+  @GetMapping("fastFetchABTest")
+  public String fastFetchABTest(String userId, String experimentVariableName, String defaultValue)
+      throws JsonProcessingException {
+    return testService.fastFetchABTest(userId, experimentVariableName, defaultValue);
+  }
+
+  @GetMapping("flush")
+  public void flush() {
+    testService.flush();
+  }
+
+  @PostMapping("testNoRequest")
+  public String testNoRequest() {
+    return "{\n"
+        + "    \"status\": \"SUCCESS\",\n"
+        + "    \"results\": [\n"
+        + "        {\n"
+        + "            \"abtest_experiment_id\": \"22\",\n"
+        + "            \"abtest_experiment_group_id\": \"1\",\n"
+        + "            \"is_control_group\": false,\n"
+        + "            \"is_white_list\": false,\n"
+        + "            \"experiment_type\": \"CODE\",\n"
+        + "            \"variables\": [\n"
+        + "                {\n"
+        + "                    \"name\": \"test_xl\",\n"
+        + "                    \"type\": \"STRING\",\n"
+        + "                    \"value\": \"试验组1\"\n"
+        + "                }\n"
+        + "            ]\n"
+        + "        },\n"
+        + "        {\n"
+        + "            \"abtest_experiment_id\": \"23\",\n"
+        + "            \"abtest_experiment_group_id\": \"1\",\n"
+        + "            \"is_control_group\": false,\n"
+        + "            \"is_white_list\": false,\n"
+        + "            \"experiment_type\": \"CODE\",\n"
+        + "            \"variables\": [\n"
+        + "                {\n"
+        + "                    \"name\": \"test_xl\",\n"
+        + "                    \"type\": \"STRING\",\n"
+        + "                    \"value\": \"试验组1\"\n"
+        + "                }\n"
+        + "            ]\n"
+        + "        },\n"
+        + "        {\n"
+        + "            \"abtest_experiment_id\": \"24\",\n"
+        + "            \"abtest_experiment_group_id\": \"0\",\n"
+        + "            \"is_control_group\": true,\n"
+        + "            \"is_white_list\": false,\n"
+        + "            \"experiment_type\": \"CODE\",\n"
+        + "            \"variables\": [\n"
+        + "                {\n"
+        + "                    \"name\": \"ceshi\",\n"
+        + "                    \"type\": \"STRING\",\n"
+        + "                    \"value\": \"ceshi1\"\n"
+        + "                }\n"
+        + "            ]\n"
+        + "        },\n"
+        + "        {\n"
+        + "            \"abtest_experiment_id\": \"25\",\n"
+        + "            \"abtest_experiment_group_id\": \"0\",\n"
+        + "            \"is_control_group\": true,\n"
+        + "            \"is_white_list\": false,\n"
+        + "            \"experiment_type\": \"CODE\",\n"
+        + "            \"variables\": [\n"
+        + "                {\n"
+        + "                    \"name\": \"cs\",\n"
+        + "                    \"type\": \"INTEGER\",\n"
+        + "                    \"value\": \"1\"\n"
+        + "                }\n"
+        + "            ]\n"
+        + "        },\n"
+        + "        {\n"
+        + "            \"abtest_experiment_id\": \"29\",\n"
+        + "            \"abtest_experiment_group_id\": \"0\",\n"
+        + "            \"is_control_group\": true,\n"
+        + "            \"is_white_list\": false,\n"
+        + "            \"experiment_type\": \"CODE\",\n"
+        + "            \"variables\": [\n"
+        + "                {\n"
+        + "                    \"name\": \"testname\",\n"
+        + "                    \"type\": \"INTEGER\",\n"
+        + "                    \"value\": \"11\"\n"
+        + "                }\n"
+        + "            ]\n"
+        + "        }\n"
+        + "    ]\n"
+        + "}";
+  }
+
 
   @GetMapping("hello")
   public String hello(String userId) throws InvalidArgumentException {

@@ -17,25 +17,26 @@
         <java.version>1.8</java.version>
         <kotlin.version>1.5.20-RC</kotlin.version>
         <!-- 如果需要修改神策 SDK 版本号，修改该处重新依赖引入就可以了 -->
-        <abTest.version>0.0.1</abTest.version>
+        <abTest.version>0.0.2</abTest.version>
         <sensors.version>3.2.0</sensors.version>
     </properties>
     <dependencies>
         <!--引入神策 AB Test SDK  -->
-        <dependency>
+       <!-- <dependency>
             <groupId>com.sensorsdata.analytics.javasdk</groupId>
             <artifactId>SensorsABTesting</artifactId>
             <version>${abTest.version}</version>
-        </dependency>
+        </dependency>-->
         <!-- 引入神策分析 SDK -->
-        <dependency>
+       <!-- <dependency>
             <groupId>com.sensorsdata.analytics.javasdk</groupId>
             <artifactId>SensorsAnalyticsSDK</artifactId>
             <version>${sensors.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -52,10 +53,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
@@ -63,12 +60,34 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <!-- 排除 Spring-boot-starter 默认的日志配置 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
     </dependencies>
 
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

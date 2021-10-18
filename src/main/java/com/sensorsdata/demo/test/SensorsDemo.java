@@ -1,8 +1,11 @@
 package com.sensorsdata.demo.test;
 
+import com.sensorsdata.analytics.javasdk.bean.EventRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
 import com.sensorsdata.demo.util.SensorsLogsUtil;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,12 +23,15 @@ public class SensorsDemo {
     //记录程序开始时间
     Long start = System.currentTimeMillis();
     Map<String, Object> params = new HashMap<>();
-    params.put("birthday", "2021-08-26");
+    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    params.put("birthday", null);
+    params.put("$app_version", "3.2.0");
     //生成 20 条记录，扔到线程池里面异步处理
     for (int i = 0; i < 20; i++) {
-      UserRecord userRecord =
-          UserRecord.builder().setDistinctId("test-" + i).isLoginId(true).addProperties(params).build();
-      SensorsLogsUtil.user(userRecord);
+      EventRecord record =
+          EventRecord.builder().setDistinctId("fz-test-" + i).isLoginId(true).setEventName("test")
+              .addProperties(params).build();
+      SensorsLogsUtil.event(record);
     }
     //打印程序执行耗时
     System.out.printf("程序总运行耗时为：%d%n", System.currentTimeMillis() - start);

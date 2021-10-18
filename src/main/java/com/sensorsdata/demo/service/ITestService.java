@@ -38,4 +38,12 @@ public interface ITestService {
 
   String itemInfo(Map<String, Object> params)
       throws InvalidArgumentException, JsonProcessingException;
+
+  void flush();
+
+  String fastFetchABTest(String userId, String experimentVariableName, String defaultValue)
+      throws JsonProcessingException;
+
+  String asyncFetchABTest(String userId, String experimentVariableName, String defaultValue)
+      throws JsonProcessingException;
 }

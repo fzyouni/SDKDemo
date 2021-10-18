@@ -5,7 +5,9 @@ import com.sensorsdata.analytics.javasdk.SensorsAnalytics;
 import com.sensorsdata.analytics.javasdk.bean.EventRecord;
 import com.sensorsdata.analytics.javasdk.bean.ItemRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
+import com.sensorsdata.analytics.javasdk.consumer.BatchConsumer;
 import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
+import com.sensorsdata.analytics.javasdk.consumer.DebugConsumer;
 import com.sensorsdata.analytics.javasdk.exceptions.InvalidArgumentException;
 
 import org.slf4j.Logger;
@@ -27,7 +29,8 @@ public class SensorsLogsUtil {
 
   private SensorsLogsUtil() {
   }
-  private  final static Logger logger = LoggerFactory.getLogger(SensorsLogsUtil.class);
+
+  private final static Logger logger = LoggerFactory.getLogger(SensorsLogsUtil.class);
 
   /**
    * 根据业务服务器实际性能决定开启线程数
@@ -42,7 +45,8 @@ public class SensorsLogsUtil {
   static {
     try {
       //在这里配置神策 SDK 初始化操作
-      sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
+      //sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
+      sa = new SensorsAnalytics(new BatchConsumer("http://10.129.138.189:8106/sa?project=production"));
     } catch (Exception e) {
       logger.error("initialize sensorsAnalytics fail.{}", e.getMessage());
     }
