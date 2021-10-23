@@ -46,7 +46,7 @@ public class SensorsConfig {
   @Bean
   public ISensorsABTest initSensorsABTest(ISensorsAnalytics sa) throws InvalidArgumentException {
     //String url = "https://abtest-aws-us-east-01.saas.sensorsdata.com/api/v2/abtest/online/results?project-key=0675F7B571A0D5C1A82B079F8D54B7D1E28627F2";
-    String url = "http://10.129.138.189:8088/testNoRequest";
+    String url = "http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=C6C0A59DA0923C4C813F0FD62CBA342AC60350EE";
     ABGlobalConfig config = ABGlobalConfig.builder().setApiUrl(url).setSensorsAnalytics(sa).build();
     return new SensorsABTest(config);
   }
