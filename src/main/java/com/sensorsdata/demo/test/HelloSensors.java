@@ -6,11 +6,7 @@ import com.sensorsdata.analytics.javasdk.bean.EventRecord;
 import com.sensorsdata.analytics.javasdk.bean.ItemRecord;
 import com.sensorsdata.analytics.javasdk.bean.SuperPropertiesRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
-import com.sensorsdata.analytics.javasdk.consumer.BatchConsumer;
 import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
-import com.sensorsdata.analytics.javasdk.consumer.DebugConsumer;
-
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,12 +25,10 @@ public class HelloSensors {
 
   public static void main(final String[] args) throws Exception {
 
-    final String format = DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss:SSS");
-    System.out.println(format);
     // LoggingConsumer
    // final ISensorsAnalytics sa =
    //     new SensorsAnalytics(new BatchConsumer("http://10.129.138.189:8106/sa?project=production"));
-    /* final ISensorsAnalytics sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
+     final ISensorsAnalytics sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
     //设置公共属性,以后上传的每一个事件都附带该属性
     SuperPropertiesRecord propertiesRecord = SuperPropertiesRecord.builder()
         .addProperty("$os", "Windows")
@@ -150,6 +144,6 @@ public class HelloSensors {
     //删除物品纬度信息
     ItemRecord deleteRecord = ItemRecord.builder().setItemId(itemId).setItemType(itemType)
         .build();
-    sa.itemDelete(deleteRecord);*/
+    sa.itemDelete(deleteRecord);
   }
 }
