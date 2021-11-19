@@ -17,22 +17,33 @@
         <java.version>1.8</java.version>
         <kotlin.version>1.5.20-RC</kotlin.version>
         <!-- 如果需要修改神策 SDK 版本号，修改该处重新依赖引入就可以了 -->
-        <abTest.version>0.0.2</abTest.version>
+        <abTest.version>0.0.3</abTest.version>
         <sensors.version>3.2.0</sensors.version>
     </properties>
     <dependencies>
+        <!-- hive 数据源链接 -->
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-jdbc</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.6.5</version>
+        </dependency>
         <!--引入神策 AB Test SDK  -->
-       <!-- <dependency>
+        <dependency>
             <groupId>com.sensorsdata.analytics.javasdk</groupId>
             <artifactId>SensorsABTesting</artifactId>
             <version>${abTest.version}</version>
-        </dependency>-->
+        </dependency>
         <!-- 引入神策分析 SDK -->
-       <!-- <dependency>
+        <dependency>
             <groupId>com.sensorsdata.analytics.javasdk</groupId>
             <artifactId>SensorsAnalyticsSDK</artifactId>
-            <version>${sensors.version}</version>
-        </dependency>-->
+            <version>3.2.1</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -75,6 +86,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
+
     </dependencies>
 
 
@@ -83,6 +95,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
