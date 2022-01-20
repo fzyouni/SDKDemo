@@ -3,18 +3,21 @@ package com.sensorsdata.demo.util;
 import com.sensorsdata.analytics.javasdk.ISensorsAnalytics;
 import com.sensorsdata.analytics.javasdk.SensorsAnalytics;
 import com.sensorsdata.analytics.javasdk.bean.EventRecord;
+import com.sensorsdata.analytics.javasdk.bean.FailedData;
 import com.sensorsdata.analytics.javasdk.bean.ItemRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
-import com.sensorsdata.analytics.javasdk.consumer.BatchConsumer;
 import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
-import com.sensorsdata.analytics.javasdk.consumer.DebugConsumer;
+import com.sensorsdata.analytics.javasdk.consumer.FastBatchConsumer;
 import com.sensorsdata.analytics.javasdk.exceptions.InvalidArgumentException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,12 +33,24 @@ public class SensorsLogsUtil {
   private SensorsLogsUtil() {
   }
 
+
   private final static Logger logger = LoggerFactory.getLogger(SensorsLogsUtil.class);
 
   /**
    * 根据业务服务器实际性能决定开启线程数
    */
   private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+  //定义一个定时线程，用于定时检查容器中是否存在失败数据
+  private static final ScheduledExecutorService resendService = Executors.newSingleThreadScheduledExecutor();
+
+  //失败数据容器，（此处用于模式测试，生产中可能会有大量数据，因此不建议使用内存容器，会造成 OOM，建议持久化）
+  private static final List<FailedData> failedDataList = new ArrayList<>();
+
+  //往容器中保存数据
+  public static void setFailedData(FailedData failedData) {
+    failedDataList.add(failedData);
+  }
 
   /**
    * 构建 sa 实例化对象
@@ -45,8 +60,7 @@ public class SensorsLogsUtil {
   static {
     try {
       //在这里配置神策 SDK 初始化操作
-      //sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
-      sa = new SensorsAnalytics(new BatchConsumer("http://10.129.138.189:8106/sa?project=production"));
+      sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
     } catch (Exception e) {
       logger.error("initialize sensorsAnalytics fail.{}", e.getMessage());
     }
@@ -62,6 +76,10 @@ public class SensorsLogsUtil {
 
   public static void item(ItemRecord itemRecord) {
     executorService.execute(new DealTask(itemRecord));
+  }
+
+  public static void resend(FastBatchConsumer consumer) {
+    resendService.scheduleWithFixedDelay(new ResendTask(consumer), 0, 1, TimeUnit.SECONDS);
   }
 
   /**
@@ -87,6 +105,28 @@ public class SensorsLogsUtil {
       Thread.currentThread().interrupt();
     }
     sa.shutdown();
+  }
+
+  static class ResendTask implements Runnable {
+
+    private final FastBatchConsumer consumer;
+
+    public ResendTask(FastBatchConsumer consumer) {
+      this.consumer = consumer;
+    }
+
+    @Override
+    public void run() {
+      if (!failedDataList.isEmpty()) {
+        for (FailedData failedData : failedDataList) {
+          try {
+         /*   consumer.resendFailedData(failedData);*/
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    }
   }
 
 

@@ -3,10 +3,12 @@ package com.sensorsdata.demo.test;
 import com.sensorsdata.analytics.javasdk.ISensorsAnalytics;
 import com.sensorsdata.analytics.javasdk.SensorsAnalytics;
 import com.sensorsdata.analytics.javasdk.bean.EventRecord;
+import com.sensorsdata.analytics.javasdk.bean.FailedData;
 import com.sensorsdata.analytics.javasdk.bean.ItemRecord;
 import com.sensorsdata.analytics.javasdk.bean.SuperPropertiesRecord;
 import com.sensorsdata.analytics.javasdk.bean.UserRecord;
-import com.sensorsdata.analytics.javasdk.consumer.ConcurrentLoggingConsumer;
+import com.sensorsdata.analytics.javasdk.consumer.BatchConsumer;
+import com.sensorsdata.analytics.javasdk.consumer.FastBatchConsumer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,9 +28,16 @@ public class HelloSensors {
   public static void main(final String[] args) throws Exception {
 
     // LoggingConsumer
-   // final ISensorsAnalytics sa =
-   //     new SensorsAnalytics(new BatchConsumer("http://10.129.138.189:8106/sa?project=production"));
-     final ISensorsAnalytics sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
+     final ISensorsAnalytics sa = new SensorsAnalytics(new BatchConsumer("http://10.129.138.189:8106/sa?project=production"));
+    // final ISensorsAnalytics sa = new SensorsAnalytics(new ConcurrentLoggingConsumer("file.log"));
+
+    //存放失败数据的容器
+   // List<FailedData> dataList = new ArrayList<>();
+
+    /*FastBatchConsumer fastBatchConsumer = new FastBatchConsumer("http://localhost:8080/test", failedData -> {
+      dataList.add(failedData);
+    });*/
+    //final ISensorsAnalytics sa = new SensorsAnalytics(fastBatchConsumer);
     //设置公共属性,以后上传的每一个事件都附带该属性
     SuperPropertiesRecord propertiesRecord = SuperPropertiesRecord.builder()
         .addProperty("$os", "Windows")
